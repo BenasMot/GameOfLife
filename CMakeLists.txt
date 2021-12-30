@@ -3,10 +3,13 @@ project(GameOfLife)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} test-sdl.cpp)
 
 find_package(OpenMP REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+
+find_package(SDL2 CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2-static)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
