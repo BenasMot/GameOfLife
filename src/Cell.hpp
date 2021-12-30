@@ -1,41 +1,38 @@
+#pragma once
 #include <tuple>
 #include <utility>
 #include <vector>
-
-#include "Neighbour.hpp"
 
 using namespace std;
 
 class Cell {
  private:
   bool isAlive;
-  pair<int, int> coordinates;
+  int nearbyCells;
 
  public:
-  Cell(int x, int y);
+  Cell(bool isAlive);
   ~Cell();
-  pair<int, int> getCoordinates();
+  // Setters
+  void setIsAlive(bool isAlive);
+  void setNearbyCells(int nearbyCells);
+  // Getters
   bool getIsAlive();
-  vector<Neighbour> getNeighbours(vector<vector<bool>> grid);
+  int getNearbyCells();
+  // Actions
+  void increaseNearbyCells(int count = 1);
 };
 
-Cell::Cell(int x, int y) { this->coordinates = make_pair(x, y); }
+Cell::Cell(bool isAlive) { this->isAlive = isAlive; }
 Cell::~Cell() {}
 
-pair<int, int> Cell::getCoordinates() { return coordinates; }
+// Setters
+void Cell::setIsAlive(bool isAlive) { this->isAlive = isAlive; }
+void Cell::setNearbyCells(int nearbyCells) { this->nearbyCells = nearbyCells; }
+
+// Getters
 bool Cell::getIsAlive() { return isAlive; }
-vector<Neighbour> Cell::getNeighbours(vector<vector<bool>> grid) {
-  vector<Neighbour> neighbours;
-  auto [x, y] = coordinates;
+int Cell::getNearbyCells() { return nearbyCells; }
 
-  neighbours.push_back(Neighbour(make_pair(x - 1, y - 1), grid[x - 1][y - 1]));
-  neighbours.push_back(Neighbour(make_pair(x, y - 1), grid[x][y - 1]));
-  neighbours.push_back(Neighbour(make_pair(x + 1, y - 1), grid[x + 1][y - 1]));
-  neighbours.push_back(Neighbour(make_pair(x - 1, y), grid[x - 1][y]));
-  neighbours.push_back(Neighbour(make_pair(x + 1, y), grid[x + 1][y]));
-  neighbours.push_back(Neighbour(make_pair(x - 1, y + 1), grid[x - 1][y + 1]));
-  neighbours.push_back(Neighbour(make_pair(x, y + 1), grid[x][y + 1]));
-  neighbours.push_back(Neighbour(make_pair(x + 1, y + 1), grid[x + 1][y + 1]));
-
-  return neighbours;
-}
+// Actions
+void Cell::increaseNearbyCells(int count) { this->nearbyCells += count; }
