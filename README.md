@@ -30,5 +30,9 @@
 
 ---
 ## **To-do:**
-- Kaip infinite daryti?
-- Dėl figurų ir žaidimų pabaigos
+- Padaryti baigtinį ir begalinį žaidimo režimus
+- Padaryti logiką su tikrinimais ląstelių gimimui ir mirimui
+- Ėjimų skaičiavimas, bet čia lol, tsg count++
+- Padaryti vizualizavimą tiek eigai, tiek pabaigai
+- Išlygiagretinti programą
+- Parodyti, kad paspartina, arba jeigu nepaspartina why
