@@ -8,7 +8,7 @@ using namespace std;
 class Cell {
  private:
   bool isAlive;
-  int nearbyCells;
+  int nearbyCells = 0;
 
  public:
   Cell(bool isAlive);
