@@ -96,17 +96,13 @@ void GameOfLife::removeCell(Coords coords) {
   } else if (state[coords]->getIsAlive()) {
     state[coords]->setWillDie();
     for (auto neighbourCoords : getNeighboursCoords(coords)) {
-      bool isNeighbourNotInitialized = state.count(coords) == 0;
-      if (isNeighbourNotInitialized) continue;
-
-      state[neighbourCoords]->increaseNearbyCells(-1);
+      bool isNeighbourInitialized = state.count(neighbourCoords) != 0;
+      if (isNeighbourInitialized) state[neighbourCoords]->increaseNearbyCells(-1);
     }
   }
 }
 
 void GameOfLife::update() {
-  this->state;
-
   for (auto cell : this->state) {
     auto nearbyCellCount = cell.second->getNearbyCells();
     bool isAlive = cell.second->getIsAlive();
@@ -129,7 +125,9 @@ void GameOfLife::update() {
     if (cellInstance->getWillDie()) cellInstance->die();
     if (cellInstance->getWillAppear()) cellInstance->appear();
     cellInstance->updateNearby();
+  }
 
+  for (auto cell : this->state) {
     Coords coords = cell.first;
     if (cellShouldBeRemoved(state[coords])) {
       state.erase(coords);
