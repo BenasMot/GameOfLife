@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int x_max = 6, y_max = 6;
+int x_max = 12, y_max = 12;
 void logState(Grid grid);
 
 int main() {
@@ -26,7 +26,7 @@ int main() {
   game.initialize(init);
 
   logState(game.getState());
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 18; i++) {
     game.update();
     logState(game.getState());
   }
@@ -35,26 +35,20 @@ int main() {
 
 void logState(Grid grid) {
   cout << "---------" << endl;
-  for (int i = -x_max; i < x_max; i++) {
-    for (int j = -y_max; j < y_max; j++) {
+  for (int i = -4; i < x_max; i++) {
+    for (int j = -4; j < y_max; j++) {
       if (grid.count(pair{j, i}) != 0) {
-        cout << (grid[pair{j, i}]->getIsAlive() ? "⬛️" : "⬜");  //⬜️⬛️🟥
+        Cell *cell = grid[pair{j, i}];
+        // if (cell->getIsAlive()) {
+        //   cout << "\033[1;34m" << cell->getNearbyCells() << cell->getWillDie();
+        // } else {
+        //   cout << "\033[1;31m" << cell->getNearbyCells() << cell->getWillAppear();
+        // }
+        cout << (cell->getIsAlive() ? "⬛️" : "⬜️");  //⬜️⬛️🟥
       } else {
         cout << "⬜";
       }
     }
     cout << endl;
   }
-  // cout << "---------" << endl;
-  // for (int i = -x_max; i < x_max; i++) {
-  //   for (int j = -y_max; j < y_max; j++) {
-  //     if (grid.count(pair{j, i}) != 0) {
-  //       cout << grid[pair{j, i}]->getNearbyCells() << " ";
-  //     } else {
-  //       cout << "0 ";
-  //     }
-  //   }
-  //   cout << endl;
-  // }
-  // cout << "---------" << endl;
 }
