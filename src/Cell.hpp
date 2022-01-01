@@ -8,19 +8,29 @@ using namespace std;
 class Cell {
  private:
   bool isAlive;
-  int nearbyCells = 0;
+  bool willDie = false;
+  bool willAppear = false;
+  int currentNearby = 0;
+  int nextNearby = 0;
 
  public:
-  Cell(bool isAlive);
+  Cell(bool isAlive = false);
   ~Cell();
   // Setters
   void setIsAlive(bool isAlive);
-  void setNearbyCells(int nearbyCells);
+  void setWillDie(bool willDie = true);
+  void setWillAppear(bool willAppear = true);
+
   // Getters
   bool getIsAlive();
+  bool getWillDie();
+  bool getWillAppear();
   int getNearbyCells();
   // Actions
   void increaseNearbyCells(int count = 1);
+  void updateNearby();
+  void appear();
+  void die();
 };
 
 Cell::Cell(bool isAlive) { this->isAlive = isAlive; }
@@ -28,11 +38,28 @@ Cell::~Cell() {}
 
 // Setters
 void Cell::setIsAlive(bool isAlive) { this->isAlive = isAlive; }
-void Cell::setNearbyCells(int nearbyCells) { this->nearbyCells = nearbyCells; }
-
+void Cell::setWillDie(bool willDie) { this->willDie = willDie; }
+void Cell::setWillAppear(bool willAppear) { this->willAppear = willAppear; }
 // Getters
 bool Cell::getIsAlive() { return isAlive; }
-int Cell::getNearbyCells() { return nearbyCells; }
+bool Cell::getWillDie() { return willDie; }
+bool Cell::getWillAppear() { return willAppear; }
+int Cell::getNearbyCells() { return currentNearby; }
 
 // Actions
-void Cell::increaseNearbyCells(int count) { this->nearbyCells += count; }
+void Cell::increaseNearbyCells(int count) { this->nextNearby += count; }
+void Cell::updateNearby() {
+  currentNearby = nextNearby;
+}
+void Cell::appear() {
+  if (willAppear && !isAlive) {
+    isAlive = true;
+    willAppear = false;
+  }
+}
+void Cell::die() {
+  if (willDie && isAlive) {
+    isAlive = false;
+    willDie = false;
+  }
+}
