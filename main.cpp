@@ -8,32 +8,29 @@
 
 using namespace std;
 
-int x_max = 12, y_max = 12;
+string state =  "---++--\n"
+                "--+--+-\n"
+                "--+-+--\n"
+                "---++--"; 
+
+Grid parseInit(string input);
 void logState(Grid grid);
 
 int main() {
   GameOfLife game;
-
-  Grid init;
-  init[pair{-1, -1}] = new Cell(true);
-  init[pair{0, -1}] = new Cell(true);
-  init[pair{-2, 0}] = new Cell(true);
-  init[pair{1, 0}] = new Cell(true);
-  init[pair{-2, 1}] = new Cell(true);
-  init[pair{0, 1}] = new Cell(true);
-  init[pair{-1, 2}] = new Cell(true);
-  init[pair{0, 2}] = new Cell(true);
-  game.initialize(init);
+  game.initialize(parseInit(state));
 
   logState(game.getState());
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 1; i++) {
     game.update();
     logState(game.getState());
   }
+
   return 0;
 }
 
 void logState(Grid grid) {
+  int x_max = 12, y_max = 12;
   cout << "---------" << endl;
   for (int i = -4; i < x_max; i++) {
     for (int j = -4; j < y_max; j++) {
@@ -51,4 +48,21 @@ void logState(Grid grid) {
     }
     cout << endl;
   }
+}
+
+Grid parseInit(string input) {
+  Grid init;
+  int x = 0, y = 0;
+
+  for (auto chr : input) {
+    if (chr == '+') {
+      init[pair{x, y}] = new Cell(true);
+    } else if (chr == '\n') {
+      y++;
+      x = -1;
+    }
+    x++;
+  }
+
+  return init;
 }
