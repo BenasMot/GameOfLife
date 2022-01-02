@@ -109,7 +109,7 @@ void draw_cells(void) {
         .y = 500,
         .w = CELL_THICKNESS,
         .h = CELL_THICKNESS
-  };
+  }
 
   // cell
   SDL_RenderFillRect(game.renderer, &block);
