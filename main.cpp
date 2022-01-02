@@ -6,8 +6,24 @@
 #include "src/GameOfLife.hpp"
 #include "src/Timer.hpp"
 #include "src/Types.hpp"
+#include "src/draw.hpp"
 
 using namespace std;
+
+// string state = // Pulsar
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "--+++---+++--\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "-------------\n"
+//     "--+++---+++--\n";
 
 string state =
     "---++--\n"
@@ -21,20 +37,58 @@ void logState(Grid grid);
 int main() {
   Timer timer;
   GameOfLife game;
+
+  initialize();
   game.initialize(parseInit(state));
 
-  logState(game.getState());
+  while (app.running) {
+    // clear the screen with all black before drawing anything
+    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+    SDL_RenderClear(app.renderer);
 
-  timer.start();
-  for (int i = 0; i < 15; i++) {
+    // make so that if ESC is pressed the game closes
+    handle_input();
+
+    // draw the grid lines
+    draw_grid();
+
+    // draw the cell(s)
+    for (auto cell : game.getState()) {
+      if (cell.second->getIsAlive())
+        draw_cell(cell.first);
+      else
+        draw_cell(cell.first, "red");
+      display_generation();
+    }
+
+    app.generation++;
+
+    // update the screen with any rendering performed since the previous call
+    SDL_RenderPresent(app.renderer);
+
+    // wait <...> (right now -> zero) milliseconds before next iteration
+    // SDL_Delay(0);
     game.update();
-    // logState(game.getState());
+    // timer.setTimeout(100);
   }
-  timer.stop();
 
-  logState(game.getState());
+  cout << "Total generations: " << app.generation << endl;
 
-  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 <<  " s" << endl;
+  // make sure program cleans up on exit
+  terminate(EXIT_SUCCESS);
+
+  // logState(game.getState());
+
+  // timer.start();
+  // for (int i = 0; i < 15; i++) {
+  //   game.update();
+  //   // logState(game.getState());
+  // }
+  // timer.stop();
+
+  // logState(game.getState());
+
+  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << " s" << endl;
 
   return 0;
 }
