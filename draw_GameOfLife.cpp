@@ -1,14 +1,16 @@
 #include <SDL.h>
 
-#define SCREEN_WIDTH   1280
-#define SCREEN_HEIGHT   800
-#define CELL_THICKNESS   10
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 800
+#define GRID_SIZE 10
+#define CELL_SIZE 10
 
 void initialize(void);
 void terminate(int exit_code);
 void handle_input(void);
 
-void draw_cells(void);
+void draw_grid(void);
+void draw_cell(int x, int y);
 void display_generation(void);
 
 typedef struct {
@@ -21,7 +23,8 @@ typedef struct {
 // initialize global structure to store game state
 // and SDL renderer for use in all functions
 Game game = {
-  .running = 1
+  .running = 1,
+  .generation = 0
 };
 
 int main() {
@@ -36,12 +39,13 @@ int main() {
     
     handle_input();
     
-    draw_cells();
+    draw_grid();
+    draw_cell(300, 600);
     
 
     SDL_RenderPresent(game.renderer);
     
-    // wait 100 milliseconds before next iteration
+    // wait <...> (atm zero) milliseconds before next iteration
     SDL_Delay(0);
   }
 
@@ -100,19 +104,31 @@ void handle_input() {
   }
 }
 
-void draw_cells(void) {
-  // make the cells white
+void draw_grid(void) {
+    SDL_SetRenderDrawColor(game.renderer, 44, 44, 44, 255);
+
+    for (int grid_x = 0; grid_x < 1 + GRID_SIZE * CELL_SIZE; grid_x += CELL_SIZE) {
+        SDL_RenderDrawLine(game.renderer, grid_x, 0, grid_x, SCREEN_HEIGHT);
+    }
+
+    for (int grid_y = 0; grid_y < 1 + GRID_SIZE * CELL_SIZE; grid_y+= CELL_SIZE) {
+        SDL_RenderDrawLine(game.renderer, 0, grid_y, SCREEN_WIDTH, grid_y);
+    }
+}
+
+void draw_cell(int x, int y) {
   SDL_SetRenderDrawColor(game.renderer, 255, 255, 255, 255);
 
-  SDL_Rect block = {
-        .x = 500,
-        .y = 500,
-        .w = CELL_THICKNESS,
-        .h = CELL_THICKNESS
-  }
+  SDL_Rect cell = {
+        .x = 0,
+        .y = 0,
+        .w = CELL_SIZE,
+        .h = CELL_SIZE
+  };
 
-  // cell
-  SDL_RenderFillRect(game.renderer, &block);
+  cell.x = x;
+  cell.y = y;
+  SDL_RenderFillRect(game.renderer, &cell);
 }
 
 void display_score(void) {
