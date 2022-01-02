@@ -3,7 +3,7 @@ project(GameOfLife)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(${PROJECT_NAME} draw_GameOfLife.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 find_package(OpenMP REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
