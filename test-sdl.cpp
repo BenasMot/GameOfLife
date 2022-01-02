@@ -1,18 +1,21 @@
 #include <SDL.h>
 
-#define SCREEN_WIDTH   680
-#define SCREEN_HEIGHT  400
-#define CELL_THICKNESS   1
+#define SCREEN_WIDTH   1280
+#define SCREEN_HEIGHT   800
+#define CELL_THICKNESS   10
 
 void initialize(void);
 void terminate(int exit_code);
 void handle_input(void);
+
 void draw_cells(void);
+void display_generation(void);
 
 typedef struct {
   SDL_Renderer *renderer;
   SDL_Window *window;
   int running;
+  int generation;
 } Game;
 
 // initialize global structure to store game state
@@ -24,9 +27,6 @@ Game game = {
 int main() {
   // Initialize SDL and the relevant structures
   initialize();
-  
-  // TODO: initialize snake
-  // spawn_snake()
 
   // enter game loop
   while (game.running) {
@@ -35,12 +35,9 @@ int main() {
     SDL_RenderClear(game.renderer);
     
     handle_input();
-
-    // TODO: add update and draw functions
-    // move_snake()
-    // draw_food()
-    // draw_snake()
-    // draw_wall()
+    
+    draw_cells();
+    
 
     SDL_RenderPresent(game.renderer);
     
@@ -101,4 +98,25 @@ void handle_input() {
       game.running = 0;
     }
   }
+}
+
+void draw_cells(void) {
+  // make the cells white
+  SDL_SetRenderDrawColor(game.renderer, 255, 255, 255, 255);
+
+  SDL_Rect block = {
+        .x = 500,
+        .y = 500,
+        .w = CELL_THICKNESS,
+        .h = CELL_THICKNESS
+  };
+
+  // cell
+  SDL_RenderFillRect(game.renderer, &block);
+}
+
+void display_score(void) {
+  char buffer[20];
+  snprintf(buffer, 20, "Generation: %d", game.generation);
+  SDL_SetWindowTitle(game.window, buffer);
 }
