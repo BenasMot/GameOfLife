@@ -1,9 +1,13 @@
 #include <SDL.h>
+#include <cstdio>
+#include <iostream>
+
+using namespace std;
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 800
-#define GRID_SIZE 10
-#define CELL_SIZE 10
+#define GRID_SIZE 20
+#define CELL_SIZE 20
 
 void initialize(void);
 void terminate(int exit_code);
@@ -44,7 +48,11 @@ int main() {
     draw_grid();
 
     // draw the cell(s)
-    draw_cell(300, 600);
+    for (int i = 0; i < 5; i++){
+      draw_cell(500 + i*CELL_SIZE, 600 + i*CELL_SIZE);
+      //display_generation();
+      game.generation++;
+    }
     
     // update the screen with any rendering performed since the previous call
     SDL_RenderPresent(game.renderer);
@@ -52,6 +60,8 @@ int main() {
     // wait <...> (right now -> zero) milliseconds before next iteration
     // SDL_Delay(0);
   }
+
+  cout << "Total generations: " << game.generation << endl;
 
   // make sure program cleans up on exit
   terminate(EXIT_SUCCESS);
@@ -109,15 +119,18 @@ void handle_input() {
 }
 
 void draw_grid(void) {
-    SDL_SetRenderDrawColor(game.renderer, 44, 44, 44, 255);
+  // grid color set to gray
+  SDL_SetRenderDrawColor(game.renderer, 44, 44, 44, 255);
 
-    for (int grid_x = 0; grid_x < 1 + GRID_SIZE * CELL_SIZE; grid_x += CELL_SIZE) {
-        SDL_RenderDrawLine(game.renderer, grid_x, 0, grid_x, SCREEN_HEIGHT);
-    }
+  // vertical lines
+  for (int grid_x = 0; grid_x < 1 + SCREEN_HEIGHT*2; grid_x += GRID_SIZE) {
+      SDL_RenderDrawLine(game.renderer, grid_x, 0, grid_x, SCREEN_HEIGHT);
+  }
 
-    for (int grid_y = 0; grid_y < 1 + GRID_SIZE * CELL_SIZE; grid_y+= CELL_SIZE) {
-        SDL_RenderDrawLine(game.renderer, 0, grid_y, SCREEN_WIDTH, grid_y);
-    }
+  // horizontal lines
+  for (int grid_y = 0; grid_y < 1 + SCREEN_WIDTH; grid_y+= GRID_SIZE) {
+      SDL_RenderDrawLine(game.renderer, 0, grid_y, SCREEN_WIDTH, grid_y);
+  }
 }
 
 void draw_cell(int x, int y) {
@@ -136,7 +149,7 @@ void draw_cell(int x, int y) {
 }
 
 void display_score(void) {
-  char buffer[20];
-  snprintf(buffer, 20, "Generation: %d", game.generation);
+  char buffer [49];
+  sprintf(buffer, "Generation: %d", game.generation);
   SDL_SetWindowTitle(game.window, buffer);
 }
