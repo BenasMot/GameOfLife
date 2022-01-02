@@ -68,6 +68,7 @@ int main() {
 }
 
 void initialize() {
+  // intialize and error catching if initializing fails
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("error: failed to initialize SDL: %s\n", SDL_GetError());
     terminate(EXIT_FAILURE);
@@ -82,6 +83,7 @@ void initialize() {
     SDL_WINDOW_SHOWN
   );
 
+  // error catching
   if (!game.window) {
     printf("error: failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
     terminate(EXIT_FAILURE);
@@ -97,6 +99,7 @@ void initialize() {
 }
 
 void terminate(int exit_code) {
+  // safely terminate the program
   if (game.renderer) {
     SDL_DestroyRenderer(game.renderer);
   }
@@ -149,6 +152,7 @@ void draw_cell(int x, int y) {
 }
 
 void display_score(void) {
+  // update the window title with the generation number, everytime the function's called
   char buffer [49];
   sprintf(buffer, "Generation: %d", game.generation);
   SDL_SetWindowTitle(game.window, buffer);
