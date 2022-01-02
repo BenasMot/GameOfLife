@@ -43,7 +43,7 @@ Grid createNeighnours(Coords coords) {
   return neighbours;
 }
 
-bool cellShouldBeRemoved(Cell *cell) { return (!cell->getIsAlive() && cell->getNearbyCells() == 0); }
+bool cellShouldBeRemoved(Cell *cell) { return (!cell->getIsAlive() && cell->getNearbyCells() <= 0); }
 
 // Getters
 Grid GameOfLife::getState() { return state; }
