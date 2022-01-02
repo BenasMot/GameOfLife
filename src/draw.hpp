@@ -12,18 +12,10 @@ using namespace std;
 
 #define CELL_SIZE 5
 #define GRID_SIZE CELL_SIZE
-#define SCREEN_WIDTH 320 * CELL_SIZE
-#define SCREEN_HEIGHT 200 * CELL_SIZE
-#define X_OFFSET 130 * CELL_SIZE
-#define Y_OFFSET 95 * CELL_SIZE
-
-void initialize(void);
-void terminate(int exit_code);
-void handle_input(void);
-
-void draw_grid(void);
-void draw_cell(pair<int, int> coords, string color = "white");
-void display_generation(void);
+#define SCREEN_WIDTH 160 * CELL_SIZE
+#define SCREEN_HEIGHT 120 * CELL_SIZE
+#define X_OFFSET 20 * CELL_SIZE
+#define Y_OFFSET 60 * CELL_SIZE
 
 typedef struct {
   SDL_Renderer *renderer;
@@ -35,6 +27,18 @@ typedef struct {
 // initialize global structure to store app state
 // and SDL renderer for use in all functions
 Game app = {.running = 1, .generation = 0};
+
+void terminate(int exit_code) {
+  // safely terminate the program
+  if (app.renderer) {
+    SDL_DestroyRenderer(app.renderer);
+  }
+  if (app.window) {
+    SDL_DestroyWindow(app.window);
+  }
+  SDL_Quit();
+  exit(exit_code);
+}
 
 void initialize() {
   // intialize and error catching if initializing fails
@@ -59,18 +63,6 @@ void initialize() {
     printf("error: failed to create renderer: %s\n", SDL_GetError());
     terminate(EXIT_FAILURE);
   }
-}
-
-void terminate(int exit_code) {
-  // safely terminate the program
-  if (app.renderer) {
-    SDL_DestroyRenderer(app.renderer);
-  }
-  if (app.window) {
-    SDL_DestroyWindow(app.window);
-  }
-  SDL_Quit();
-  exit(exit_code);
 }
 
 void handle_input() {
@@ -99,7 +91,7 @@ void draw_grid(void) {
   }
 }
 
-void draw_cell(Coords coords, string color) {
+void draw_cell(Coords coords, string color = "white") {
   int r, g, b, a = 255;
   if (color == "white") {
     r = g = b = 255;
@@ -120,9 +112,9 @@ void draw_cell(Coords coords, string color) {
 
 void display_generation(void) {
   // update the window title with the generation number, everytime the function's called
-  // char buffer [49];
-  string buffer = "Generation: " + app.generation;
-  SDL_SetWindowTitle(app.window, buffer.c_str());
+  char buffer[49];
+  sprintf(buffer, "Generation: %i", app.generation);
+  SDL_SetWindowTitle(app.window, buffer);
 }
 
 #endif

@@ -11,25 +11,44 @@
 using namespace std;
 
 // string state = // Pulsar
-//     "--+++---+++--\n"
-//     "-------------\n"
-//     "+----+-+----+\n"
-//     "+----+-+----+\n"
-//     "+----+-+----+\n"
-//     "--+++---+++--\n"
-//     "-------------\n"
-//     "--+++---+++--\n"
-//     "+----+-+----+\n"
-//     "+----+-+----+\n"
-//     "+----+-+----+\n"
-//     "-------------\n"
-//     "--+++---+++--\n";
+    // "--+++---+++--\n"
+    // "-------------\n"
+    // "+----+-+----+\n"
+    // "+----+-+----+\n"
+    // "+----+-+----+\n"
+    // "--+++---+++--\n"
+    // "-------------\n"
+    // "--+++---+++--\n"
+    // "+----+-+----+\n"
+    // "+----+-+----+\n"
+    // "+----+-+----+\n"
+    // "-------------\n"
+    // "--+++---+++--\n";
 
-string state =
+string state = // The R-pentonimo
     "---++--\n"
     "--++---\n"
     "---+---\n"
     "-------";
+
+// string state =  // diehard
+//     "------+-\n"
+//     "++------\n"
+//     "-+---+++\n";
+
+// string state = // acorn
+//     "-+--------\n"
+//     "---+------\n"
+//     "++--+++---\n";
+
+// string state =  // npm logo
+//     "++++-++++-++++++\n"
+//     "++-+-++-+-++-+-+\n"
+//     "++-+-++-+-++-+-+\n"
+//     "++-+-++++-++-+-+\n"
+//     "-----++---------\n";
+
+// string state = "++++++++ +++++   +++      +++++++ +++++";
 
 Grid parseInit(string input);
 void logState(Grid grid);
@@ -54,14 +73,15 @@ int main() {
 
     // draw the cell(s)
     for (auto cell : game.getState()) {
-      if (cell.second->getIsAlive())
+      if (cell.second->getIsAlive()) {
         draw_cell(cell.first);
-      else
+      } else {
         draw_cell(cell.first, "red");
-      display_generation();
+      }
     }
 
     app.generation++;
+    display_generation();
 
     // update the screen with any rendering performed since the previous call
     SDL_RenderPresent(app.renderer);
@@ -69,7 +89,7 @@ int main() {
     // wait <...> (right now -> zero) milliseconds before next iteration
     // SDL_Delay(0);
     game.update();
-    // timer.setTimeout(100);
+    timer.setTimeout(33);
   }
 
   cout << "Total generations: " << app.generation << endl;
