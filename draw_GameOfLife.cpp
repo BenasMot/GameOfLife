@@ -37,16 +37,20 @@ int main() {
     SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
     SDL_RenderClear(game.renderer);
     
+    // make so that if ESC is pressed the game closes
     handle_input();
     
+    // draw the grid lines
     draw_grid();
+
+    // draw the cell(s)
     draw_cell(300, 600);
     
-
+    // update the screen with any rendering performed since the previous call
     SDL_RenderPresent(game.renderer);
     
-    // wait <...> (atm zero) milliseconds before next iteration
-    SDL_Delay(0);
+    // wait <...> (right now -> zero) milliseconds before next iteration
+    // SDL_Delay(0);
   }
 
   // make sure program cleans up on exit
