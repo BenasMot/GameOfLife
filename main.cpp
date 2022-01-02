@@ -4,36 +4,46 @@
 #include <map>
 
 #include "src/GameOfLife.hpp"
+#include "src/Timer.hpp"
 #include "src/Types.hpp"
 
 using namespace std;
 
-string state =  "---++--\n"
-                "--+--+-\n"
-                "--+-+--\n"
-                "---++--"; 
+string state =
+    "---++--\n"
+    "--++---\n"
+    "---+---\n"
+    "-------";
 
 Grid parseInit(string input);
 void logState(Grid grid);
 
 int main() {
+  Timer timer;
   GameOfLife game;
   game.initialize(parseInit(state));
 
   logState(game.getState());
-  for (int i = 0; i < 1; i++) {
+
+  timer.start();
+  for (int i = 0; i < 15; i++) {
     game.update();
-    logState(game.getState());
+    // logState(game.getState());
   }
+  timer.stop();
+
+  logState(game.getState());
+
+  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 <<  " s" << endl;
 
   return 0;
 }
 
 void logState(Grid grid) {
-  int x_max = 12, y_max = 12;
+  int y_max = 30, x_max = 70;
   cout << "---------" << endl;
-  for (int i = -4; i < x_max; i++) {
-    for (int j = -4; j < y_max; j++) {
+  for (int i = -30; i < y_max; i++) {
+    for (int j = -40; j < x_max; j++) {
       if (grid.count(pair{j, i}) != 0) {
         Cell *cell = grid[pair{j, i}];
         // if (cell->getIsAlive()) {
@@ -41,7 +51,7 @@ void logState(Grid grid) {
         // } else {
         //   cout << "\033[1;31m" << cell->getNearbyCells() << cell->getWillAppear();
         // }
-        cout << (cell->getIsAlive() ? "⬛️" : "⬜️");  //⬜️⬛️🟥
+        cout << (cell->getIsAlive() ? "⬛️" : "🟥");  //⬜️⬛️🟥
       } else {
         cout << "⬜";
       }
