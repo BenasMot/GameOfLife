@@ -3,5 +3,5 @@
 #include <utility>
 
 #include "Cell.hpp"
-using Grid = std::map<std::pair<char, char>, Cell*>;
-using Coords = pair<char, char>;
+using Coords = pair<int, int>;
+using Grid = std::map<Coords, Cell*>;
