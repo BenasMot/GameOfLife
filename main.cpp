@@ -25,21 +25,21 @@ using namespace std;
     // "-------------\n"
     // "--+++---+++--\n";
 
-string state = // The R-pentonimo
-    "---++--\n"
-    "--++---\n"
-    "---+---\n"
-    "-------";
+// string state = // The R-pentonimo
+//     "---++--\n"
+//     "--++---\n"
+//     "---+---\n"
+//     "-------";
 
 // string state =  // diehard
 //     "------+-\n"
 //     "++------\n"
 //     "-+---+++\n";
 
-// string state = // acorn
-//     "-+--------\n"
-//     "---+------\n"
-//     "++--+++---\n";
+string state = // acorn
+    "-+--------\n"
+    "---+------\n"
+    "++--+++---\n";
 
 // string state =  // npm logo
 //     "++++-++++-++++++\n"
@@ -89,7 +89,7 @@ int main() {
     // wait <...> (right now -> zero) milliseconds before next iteration
     // SDL_Delay(0);
     game.update();
-    timer.setTimeout(33);
+    // timer.setTimeout(1);
   }
 
   cout << "Total generations: " << app.generation << endl;

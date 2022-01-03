@@ -9,12 +9,15 @@ class GameOfLife {
  private:
   Grid state;
   void updateAllNearbyCellCounts();
+  void updateNextState();
+  void mergeNextState();
+  void eraseUnusedCells();
 
  public:
   GameOfLife(){};
   ~GameOfLife(){};
 
-  //Getters
+  // Getters
   Grid getState();
 
   // Actions
@@ -86,7 +89,7 @@ void GameOfLife::addCell(Coords coords) {
   } else {
     return;
   }
-  
+
   state.merge(createNeighnours(coords));
   for (auto neighbourCoords : getNeighboursCoords(coords)) {
     state[neighbourCoords]->increaseNearbyCells();
@@ -107,7 +110,7 @@ void GameOfLife::removeCell(Coords coords) {
   }
 }
 
-void GameOfLife::update() {
+void GameOfLife::updateNextState() {
   for (auto cell : this->state) {
     auto nearbyCellCount = cell.second->getNearbyCells();
     bool isAlive = cell.second->getIsAlive();
@@ -124,18 +127,29 @@ void GameOfLife::update() {
       }
     }
   }
+}
 
+void GameOfLife::mergeNextState() {
   for (auto cell : this->state) {
     Cell *cellInstance = cell.second;
     if (cellInstance->getWillDie()) cellInstance->die();
     if (cellInstance->getWillAppear()) cellInstance->appear();
     cellInstance->updateNearby();
   }
+}
 
-  for (auto cell : this->state) {
-    Coords coords = cell.first;
-    if (cellShouldBeRemoved(state[coords])) {
-      state.erase(coords);
+void GameOfLife::eraseUnusedCells() {
+  for (auto it = state.begin(); it != state.end();) {
+    if (cellShouldBeRemoved(it->second)) {
+      state.erase(it++);
+    } else {
+      ++it;
     }
   }
+}
+
+void GameOfLife::update() {
+  updateNextState();
+  mergeNextState();
+  eraseUnusedCells();
 }

@@ -10,12 +10,12 @@
 
 using namespace std;
 
-#define CELL_SIZE 5
+#define CELL_SIZE 2
 #define GRID_SIZE CELL_SIZE
-#define SCREEN_WIDTH 160 * CELL_SIZE
-#define SCREEN_HEIGHT 120 * CELL_SIZE
-#define X_OFFSET 20 * CELL_SIZE
-#define Y_OFFSET 60 * CELL_SIZE
+#define SCREEN_WIDTH 960 * CELL_SIZE
+#define SCREEN_HEIGHT 540 * CELL_SIZE
+#define X_OFFSET SCREEN_WIDTH / 2
+#define Y_OFFSET SCREEN_HEIGHT / 2
 
 typedef struct {
   SDL_Renderer *renderer;
