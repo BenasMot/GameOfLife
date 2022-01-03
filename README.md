@@ -30,9 +30,7 @@
 
 ---
 ## **To-do:**
-- Padaryti baigtinį ir begalinį žaidimo režimus
-- Padaryti logiką su tikrinimais ląstelių gimimui ir mirimui
-- Ėjimų skaičiavimas, bet čia lol, tsg count++
-- Padaryti vizualizavimą tiek eigai, tiek pabaigai
+- Padaryti periodinį žaidimo režimą
+- Padaryti, kad žaidimas baigtųsi, kai <...>
 - Išlygiagretinti programą
-- Parodyti, kad paspartina, arba jeigu nepaspartina why
+- Parodyti, kad išlygiagretinimas paspartina, arba jeigu nepaspartina, tai why
