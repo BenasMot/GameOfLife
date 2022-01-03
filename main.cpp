@@ -96,20 +96,7 @@ int main() {
 
   // make sure program cleans up on exit
   terminate(EXIT_SUCCESS);
-
-  // logState(game.getState());
-
-  // timer.start();
-  // for (int i = 0; i < 15; i++) {
-  //   game.update();
-  //   // logState(game.getState());
-  // }
-  // timer.stop();
-
-  // logState(game.getState());
-
-  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << " s" << endl;
-
+  
   return 0;
 }
 

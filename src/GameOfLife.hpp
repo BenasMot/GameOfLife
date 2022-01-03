@@ -13,8 +13,12 @@ class GameOfLife {
  public:
   GameOfLife(){};
   ~GameOfLife(){};
+
+  //Getters
   Grid getState();
-  void initialize(Grid state);
+
+  // Actions
+  void initialize(Grid init);
   void addCell(Coords coords);
   void removeCell(Coords coords);
   void update();
@@ -82,6 +86,7 @@ void GameOfLife::addCell(Coords coords) {
   } else {
     return;
   }
+  
   state.merge(createNeighnours(coords));
   for (auto neighbourCoords : getNeighboursCoords(coords)) {
     state[neighbourCoords]->increaseNearbyCells();

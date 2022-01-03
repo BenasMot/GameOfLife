@@ -16,6 +16,7 @@ class Cell {
  public:
   Cell(bool isAlive = false);
   ~Cell();
+  
   // Setters
   void setIsAlive(bool isAlive);
   void setWillDie(bool willDie = true);
@@ -26,6 +27,7 @@ class Cell {
   bool getWillDie();
   bool getWillAppear();
   int getNearbyCells();
+
   // Actions
   void increaseNearbyCells(int count = 1);
   void updateNearby();
