@@ -1,6 +1,6 @@
 #ifndef DRAW_H
-
 #define DRAW_H
+
 #include <SDL.h>
 
 #include <cstdio>
@@ -10,12 +10,12 @@
 
 using namespace std;
 
-#define CELL_SIZE 2
+#define CELL_SIZE 5
 #define GRID_SIZE CELL_SIZE
-#define SCREEN_WIDTH 960 * CELL_SIZE
-#define SCREEN_HEIGHT 540 * CELL_SIZE
-#define X_OFFSET SCREEN_WIDTH / 2
-#define Y_OFFSET SCREEN_HEIGHT / 2
+#define SCREEN_WIDTH 200 * CELL_SIZE
+#define SCREEN_HEIGHT 200 * CELL_SIZE
+#define X_OFFSET 0
+#define Y_OFFSET 0
 
 typedef struct {
   SDL_Renderer *renderer;
@@ -40,7 +40,7 @@ void terminate(int exit_code) {
   exit(exit_code);
 }
 
-void initialize() {
+void initializeApp() {
   // intialize and error catching if initializing fails
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("error: failed to initialize SDL: %s\n", SDL_GetError());

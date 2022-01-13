@@ -1,8 +1,8 @@
 #include <omp.h>
 
 #include <iostream>
-#include <map>
 
+#include "src/Cell.hpp"
 #include "src/GameOfLife.hpp"
 #include "src/Timer.hpp"
 #include "src/Types.hpp"
@@ -10,20 +10,22 @@
 
 using namespace std;
 
-// string state = // Pulsar
-    // "--+++---+++--\n"
-    // "-------------\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "--+++---+++--\n"
-    // "-------------\n"
-    // "--+++---+++--\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "-------------\n"
-    // "--+++---+++--\n";
+// string state = "+";
+
+// string state =  // Pulsar
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "--+++---+++--\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "-------------\n"
+//     "--+++---+++--\n";
 
 // string state = // The R-pentonimo
 //     "---++--\n"
@@ -36,10 +38,10 @@ using namespace std;
 //     "++------\n"
 //     "-+---+++\n";
 
-string state = // acorn
-    "-+--------\n"
-    "---+------\n"
-    "++--+++---\n";
+// string state = // acorn
+//     "-+--------\n"
+//     "---+------\n"
+//     "++--+++---\n";
 
 // string state =  // npm logo
 //     "++++-++++-++++++\n"
@@ -48,89 +50,77 @@ string state = // acorn
 //     "++-+-++++-++-+-+\n"
 //     "-----++---------\n";
 
-// string state = "++++++++ +++++   +++      +++++++ +++++";
+string state = "++++++++ +++++   +++      +++++++ +++++";
 
 Grid parseInit(string input);
 void logState(Grid grid);
+void renderState(Grid grid);
 
 int main() {
-  Timer timer;
-  GameOfLife game;
+  initializeApp();
 
-  initialize();
+  GameOfLife game(Coords(200, 200), true);
   game.initialize(parseInit(state));
 
-  while (app.running) {
-    // clear the screen with all black before drawing anything
-    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
-    SDL_RenderClear(app.renderer);
-
-    // make so that if ESC is pressed the game closes
-    handle_input();
-
-    // draw the grid lines
-    draw_grid();
-
-    // draw the cell(s)
-    for (auto cell : game.getState()) {
-      if (cell.second->getIsAlive()) {
-        draw_cell(cell.first);
-      } else {
-        draw_cell(cell.first, "red");
-      }
-    }
-
-    app.generation++;
-    display_generation();
-
-    // update the screen with any rendering performed since the previous call
-    SDL_RenderPresent(app.renderer);
-
-    // wait <...> (right now -> zero) milliseconds before next iteration
-    // SDL_Delay(0);
+  Timer timer;
+  timer.start();
+  while (app.running && app.generation++ < 599) {
+    renderState(game.getState());
     game.update();
-    // timer.setTimeout(1);
+    // timer.setTimeout(200);
   }
+  timer.stop();
 
+  while (app.running) {
+    renderState(game.getState());
+    timer.setTimeout(500);
+  }
   cout << "Total generations: " << app.generation << endl;
+  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
 
   // make sure program cleans up on exit
   terminate(EXIT_SUCCESS);
-  
+
   return 0;
 }
 
-void logState(Grid grid) {
-  int y_max = 30, x_max = 70;
-  cout << "---------" << endl;
-  for (int i = -30; i < y_max; i++) {
-    for (int j = -40; j < x_max; j++) {
-      if (grid.count(pair{j, i}) != 0) {
-        Cell *cell = grid[pair{j, i}];
-        // if (cell->getIsAlive()) {
-        //   cout << "\033[1;34m" << cell->getNearbyCells() << cell->getWillDie();
-        // } else {
-        //   cout << "\033[1;31m" << cell->getNearbyCells() << cell->getWillAppear();
-        // }
-        cout << (cell->getIsAlive() ? "⬛️" : "🟥");  //⬜️⬛️🟥
-      } else {
-        cout << "⬜";
-      }
+void renderState(Grid grid) {
+  // clear the screen with all black before drawing anything
+  SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+  SDL_RenderClear(app.renderer);
+
+  // make so that if ESC is pressed the game closes
+  handle_input();
+
+  // draw the grid lines
+  draw_grid();
+
+  // draw the cell(s)
+  for (auto cell : grid) {
+    Coords coords = cell.coordinates;
+    if (cell.isAlive) {
+      draw_cell(coords);
+    } else {
+      draw_cell(coords, "red");
     }
-    cout << endl;
   }
+
+  display_generation();
+  // update the screen with any rendering performed since the previous call
+  SDL_RenderPresent(app.renderer);
 }
 
 Grid parseInit(string input) {
   Grid init;
-  int x = 0, y = 0;
+  int xOffset = 25;
+  int x = xOffset, y = 100;
 
   for (auto chr : input) {
     if (chr == '+') {
-      init[pair{x, y}] = new Cell(true);
+      init.push_back(Cell(Coords(x, y), true));
     } else if (chr == '\n') {
       y++;
-      x = -1;
+      x = xOffset - 1;
     }
     x++;
   }

@@ -1,155 +1,142 @@
-#include <map>
-#include <utility>
+#ifndef GAMEOFLIFE_H
+#define GAMEOFLIFE_H
 
+#include "Cell.hpp"
+#include "Timer.hpp"
 #include "Types.hpp"
-
-using namespace std;
 
 class GameOfLife {
  private:
+  World world;
+  World worldNext;
+  Coords worldSize;
   Grid state;
-  void updateAllNearbyCellCounts();
-  void updateNextState();
-  void mergeNextState();
-  void eraseUnusedCells();
+  bool isPeriodic;
+
+  // Utils
+  Coords handleWorldLimits(Coords coords);
+  bool getWorldCell(Coords coords);
+  void setWorldCell(Coords coords, bool isAlive);
+  Coords worldIndexToCoords(int index);
 
  public:
-  GameOfLife(){};
-  ~GameOfLife(){};
+  GameOfLife(Coords size, bool isPeriodic);
 
   // Getters
   Grid getState();
 
   // Actions
   void initialize(Grid init);
-  void addCell(Coords coords);
-  void removeCell(Coords coords);
   void update();
 };
 
+// Constructor
+GameOfLife::GameOfLife(Coords size, bool isPeriodic) {
+  worldSize = size;
+  world = World(size.first * size.second);
+  worldNext = World(size.first * size.second);
+  isPeriodic = isPeriodic;
+  state.reserve(size.first * size.second);
+}
+
 // Utils
-vector<Coords> getNeighboursCoords(Coords coords) {
-  vector<Coords> neighbourCoords;
+Coords GameOfLife::handleWorldLimits(Coords coords) {
+  int x, y;
+  if (isPeriodic) {
+    x = coords.first % worldSize.first;
+    y = coords.second % worldSize.second;
+  } else {
+    if (coords.first > worldSize.first || coords.first < 0) {
+      x = -1;
+    } else {
+      x = coords.first;
+    }
+    if (coords.second > worldSize.second || coords.second < 0) {
+      y = -1;
+    } else {
+      y = coords.second;
+    }
+  }
+  return Coords(x, y);
+}
+
+bool GameOfLife::getWorldCell(Coords coords) {
+  auto [x, y] = coords;
+  return world[x + y * worldSize.first];
+}
+void GameOfLife::setWorldCell(Coords coords, bool isAlive) {
+  auto [x, y] = coords;
+  world[x + y * worldSize.first] = isAlive;
+}
+
+Coords GameOfLife::worldIndexToCoords(int index) {
+  int x = index % worldSize.first;
+  int y = index / worldSize.first;
+  return Coords(x, y);
+}
+
+std::vector<Coords> getNeighboursCoords(Coords coords) {
+  std::vector<Coords> neighbourCoords;
   for (int i = -1; i <= 1; i++) {
     auto x = coords.first + i;
     for (int j = -1; j <= 1; j++) {
       auto y = coords.second + j;
       if (!(i == 0 && j == 0)) {
-        neighbourCoords.push_back(pair{x, y});
+        neighbourCoords.emplace_back(Coords(x, y));
       }
     }
   }
   return neighbourCoords;
 }
 
-Grid createNeighnours(Coords coords) {
-  Grid neighbours;
-  for (auto neigbourCoords : getNeighboursCoords(coords)) {
-    neighbours[neigbourCoords] = new Cell(false);
-  }
-  return neighbours;
-}
-
-bool cellShouldBeRemoved(Cell *cell) { return (!cell->getIsAlive() && cell->getNearbyCells() <= 0); }
-
 // Getters
 Grid GameOfLife::getState() { return state; }
 
 // Actions
-void GameOfLife::updateAllNearbyCellCounts() {
-  for (auto cell : this->state) {
-    Coords coords = cell.first;
-    if (cell.second->getIsAlive()) {
-      for (auto neighbourCoords : getNeighboursCoords(coords)) {
-        this->state[neighbourCoords]->increaseNearbyCells();
-      }
-    }
-  }
-  for (auto cell : this->state) {
-    cell.second->updateNearby();
-  }
-}
-
 void GameOfLife::initialize(Grid init) {
-  this->state = init;
-  for (auto cell : init) {
-    this->state.merge(createNeighnours(cell.first));
-  }
-  updateAllNearbyCellCounts();
-}
-
-void GameOfLife::addCell(Coords coords) {
-  bool isNotInitialized = state.count(coords) == 0;
-
-  if (isNotInitialized) {
-    state[coords] = new Cell();
-    state[coords]->setWillAppear();
-  } else if (!state[coords]->getIsAlive()) {
-    state[coords]->setWillAppear();
-  } else {
-    return;
-  }
-
-  state.merge(createNeighnours(coords));
-  for (auto neighbourCoords : getNeighboursCoords(coords)) {
-    state[neighbourCoords]->increaseNearbyCells();
-  }
-}
-
-void GameOfLife::removeCell(Coords coords) {
-  bool isNotInitialized = state.count(coords) == 0;
-
-  if (isNotInitialized) {
-    return;
-  } else if (state[coords]->getIsAlive()) {
-    state[coords]->setWillDie();
-    for (auto neighbourCoords : getNeighboursCoords(coords)) {
-      bool isNeighbourInitialized = state.count(neighbourCoords) != 0;
-      if (isNeighbourInitialized) state[neighbourCoords]->increaseNearbyCells(-1);
-    }
-  }
-}
-
-void GameOfLife::updateNextState() {
-  for (auto cell : this->state) {
-    auto nearbyCellCount = cell.second->getNearbyCells();
-    bool isAlive = cell.second->getIsAlive();
-
-    if (isAlive) {
-      if (nearbyCellCount < 2) {
-        removeCell(cell.first);
-      } else if (nearbyCellCount >= 4) {
-        removeCell(cell.first);
-      }
-    } else {
-      if (nearbyCellCount == 3) {
-        addCell(cell.first);
-      }
-    }
-  }
-}
-
-void GameOfLife::mergeNextState() {
-  for (auto cell : this->state) {
-    Cell *cellInstance = cell.second;
-    if (cellInstance->getWillDie()) cellInstance->die();
-    if (cellInstance->getWillAppear()) cellInstance->appear();
-    cellInstance->updateNearby();
-  }
-}
-
-void GameOfLife::eraseUnusedCells() {
-  for (auto it = state.begin(); it != state.end();) {
-    if (cellShouldBeRemoved(it->second)) {
-      state.erase(it++);
-    } else {
-      ++it;
+  state = init;
+  for (Cell cell : init) {
+    Coords coords = handleWorldLimits(cell.coordinates);
+    if (coords.first != -1 || coords.second != -1) {
+      setWorldCell(handleWorldLimits(cell.coordinates), cell.isAlive);
     }
   }
 }
 
 void GameOfLife::update() {
-  updateNextState();
-  mergeNextState();
-  eraseUnusedCells();
+  state.clear();
+#pragma omp parallel
+  {
+    Grid nextState;
+
+#pragma omp for
+    for (int i = 0; i < worldSize.first * worldSize.second; ++i) {
+      Coords coords = worldIndexToCoords(i);
+      int aliveNearby = 0;
+
+      auto neighbours = getNeighboursCoords(coords);
+      for (Coords neighbour : neighbours) {
+        Coords correctedCoords = handleWorldLimits(neighbour);
+        if (correctedCoords.first != -1 && correctedCoords.second != -1) {
+          aliveNearby += getWorldCell(handleWorldLimits(neighbour));
+        }
+      }
+
+      if (world[i]) {
+        worldNext[i] = !(aliveNearby < 2 || aliveNearby >= 4);
+      } else {
+        worldNext[i] = aliveNearby == 3;
+      }
+
+      if (worldNext[i]) {
+        nextState.emplace_back(Cell(coords, true));
+      }
+
+#pragma omp critical
+      state.insert(state.end(), nextState.begin(), nextState.end());
+    }
+  }
+  world.swap(worldNext);
 }
+
+#endif
