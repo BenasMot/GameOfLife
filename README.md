@@ -31,6 +31,10 @@
 ---
 ## **To-do:**
 - Padaryti periodinį žaidimo režimą
-- Padaryti, kad žaidimas baigtųsi, kai <...>
-- Išlygiagretinti programą
-- Parodyti, kad išlygiagretinimas paspartina, arba jeigu nepaspartina, tai why
+- Padaryti, kad žaidimas baigtųsi, kai:
+	- Nėra ląstelių
+	- Stacionarios ląstelės
+	- Ribiniame cikle
+	- Keliauja į begalybę (kinda done)
+- Pridėti output'ą dėl ko žaidimas baigėsi
+
