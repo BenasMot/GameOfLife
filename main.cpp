@@ -33,10 +33,10 @@ using namespace std;
 //     "---+---\n"
 //     "-------";
 
-// string state =  // diehard
-//     "------+-\n"
-//     "++------\n"
-//     "-+---+++\n";
+string state =  // diehard
+    "------+-\n"
+    "++------\n"
+    "-+---+++\n";
 
 // string state = // acorn
 //     "-+--------\n"
@@ -52,32 +52,32 @@ using namespace std;
 
 // string state = "++++++++ +++++   +++      +++++++ +++++";
 
-string state = // Gosper glider gun 8)
-    "--------------------------------------\n"
-    "-------------------------+------------\n"
-    "-----------------------+-+------------\n"
-    "-------------++------++------------++-\n"
-    "------------+---+----++------------++-\n"
-    "-++--------+-----+---++---------------\n"
-    "-++--------+---+-++----+-+------------\n"
-    "-----------+-----+-------+------------\n"
-    "------------+---+---------------------\n"
-    "-------------++-----------------------\n"
-    "--------------------------------------";
+// string state = // Gosper glider gun 8)
+//     "--------------------------------------\n"
+//     "-------------------------+------------\n"
+//     "-----------------------+-+------------\n"
+//     "-------------++------++------------++-\n"
+//     "------------+---+----++------------++-\n"
+//     "-++--------+-----+---++---------------\n"
+//     "-++--------+---+-++----+-+------------\n"
+//     "-----------+-----+-------+------------\n"
+//     "------------+---+---------------------\n"
+//     "-------------++-----------------------\n"
+//     "--------------------------------------";
 
 Grid parseInit(string input);
-void logState(Grid grid);
+//void logState(Grid grid); don't need anymore
 void renderState(Grid grid);
 
 int main() {
   initializeApp();
 
-  GameOfLife game(Coords(200, 200), true);
-  game.initialize(parseInit(state));
+  GameOfLife game(Coords(255, 255), true);
+  game.initialize(parseInit(state), app.aliveCells);
 
   Timer timer;
   timer.start();
-  while (app.running && app.generation++ < 599) {
+  while (app.running && app.generation++ < 599 && game.getAliveCells() > 0) {
     renderState(game.getState());
     game.update();
     // timer.setTimeout(200);
@@ -125,18 +125,19 @@ void renderState(Grid grid) {
 
 Grid parseInit(string input) {
   Grid init;
-  int xOffset = 25;
-  int x = xOffset, y = 100;
+  int xOffset = 50;
+  int x = xOffset, y = 50;
 
   for (auto chr : input) {
     if (chr == '+') {
       init.push_back(Cell(Coords(x, y), true));
+      app.aliveCells++;
     } else if (chr == '\n') {
       y++;
       x = xOffset - 1;
     }
     x++;
   }
-
+  
   return init;
 }

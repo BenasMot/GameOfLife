@@ -12,21 +12,22 @@ using namespace std;
 
 #define CELL_SIZE 5
 #define GRID_SIZE CELL_SIZE
-#define SCREEN_WIDTH 200 * CELL_SIZE
-#define SCREEN_HEIGHT 200 * CELL_SIZE
+#define SCREEN_WIDTH 180 * CELL_SIZE
+#define SCREEN_HEIGHT 160 * CELL_SIZE
 #define X_OFFSET 0
 #define Y_OFFSET 0
 
-typedef struct {
+struct Game {
   SDL_Renderer *renderer;
   SDL_Window *window;
   bool running;
   int generation;
-} Game;
+  int aliveCells;
+};
 
 // initialize global structure to store app state
 // and SDL renderer for use in all functions
-Game app = {.running = 1, .generation = 0};
+Game app = {.running = 1, .generation = 0, .aliveCells = 0};
 
 void terminate(int exit_code) {
   // safely terminate the program

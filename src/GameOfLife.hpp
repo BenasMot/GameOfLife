@@ -12,6 +12,7 @@ class GameOfLife {
   Coords worldSize;
   Grid state;
   bool isPeriodic;
+  int aliveCells;
 
   // Utils
   Coords handleWorldLimits(Coords coords);
@@ -24,9 +25,10 @@ class GameOfLife {
 
   // Getters
   Grid getState();
+  int getAliveCells();
 
   // Actions
-  void initialize(Grid init);
+  void initialize(Grid init, int numOfCells);
   void update();
 };
 
@@ -91,10 +93,13 @@ std::vector<Coords> getNeighboursCoords(Coords coords) {
 
 // Getters
 Grid GameOfLife::getState() { return state; }
+int GameOfLife::getAliveCells() { return aliveCells; }
 
 // Actions
-void GameOfLife::initialize(Grid init) {
+void GameOfLife::initialize(Grid init, int numOfCells) {
   state = init;
+  aliveCells = numOfCells;
+
   for (Cell cell : init) {
     Coords coords = handleWorldLimits(cell.coordinates);
     if (coords.first != -1 || coords.second != -1) {
