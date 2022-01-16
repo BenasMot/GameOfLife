@@ -127,8 +127,14 @@ void GameOfLife::ensureEndRules() {
     for (int i = worldHistory.size() - 2; i >= 0; i--) {
       if (worldHistory[i] == worldHistory[worldHistory.size() - 1]) {
 #pragma omp critical
-        shouldStop = true;
-        message = "Finished... Equilibrium found at " + (string)generation + " with a period of " + worldHistory.size()-i;
+        {
+          int period = worldHistory.size() - i - 1;
+          shouldStop = true;
+          if (period == 1)
+            message = "Finished... All cells dissapeared at generation " + std::to_string(generation - period);
+          else
+            message = "Finished... Equilibrium found at generation " + std::to_string(generation - period) + " with a period of " + std::to_string(period);
+        }
       }
     }
   }
