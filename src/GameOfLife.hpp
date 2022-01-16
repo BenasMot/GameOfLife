@@ -7,11 +7,12 @@
 
 class GameOfLife {
  private:
+  Coords worldSize;
+  bool isPeriodic;
   World world;
   World worldNext;
-  Coords worldSize;
   Grid state;
-  bool isPeriodic;
+  bool shouldStop;
 
   // Utils
   Coords handleWorldLimits(Coords coords);
@@ -19,13 +20,14 @@ class GameOfLife {
   void setWorldCell(Coords coords, bool isAlive);
   Coords worldIndexToCoords(int index);
   bool invalidCoords(Coords coords);
+  void ensureEndRules();
 
  public:
   GameOfLife(Coords size, bool isPeriodic);
 
   // Getters
   Grid getState();
-  int getAliveCells();
+  bool getShouldStop();
 
   // Actions
   void initialize(Grid init);
@@ -34,24 +36,26 @@ class GameOfLife {
 
 // Constructor
 GameOfLife::GameOfLife(Coords size, bool periodic) {
+  shouldStop = false;
+
   worldSize = size;
+  isPeriodic = periodic;
+
   world = World(size.first * size.second);
   worldNext = World(size.first * size.second);
-  isPeriodic = periodic;
+
   state.reserve(size.first * size.second);
 }
 
 // Utils
 Coords GameOfLife::handleWorldLimits(Coords coords) {
-  int x, y;
   if (isPeriodic) {
-    x = (coords.first + worldSize.first) % worldSize.first;
-    y = (coords.second + worldSize.second) % worldSize.second;
-  } else {
-    x = coords.first;
-    y = coords.second;
+    int x = (coords.first + worldSize.first) % worldSize.first;
+    int y = (coords.second + worldSize.second) % worldSize.second;
+    return Coords(x, y);
   }
-  return Coords(x, y);
+
+  return coords;
 }
 
 bool GameOfLife::getWorldCell(Coords coords) {
@@ -87,19 +91,18 @@ bool GameOfLife::invalidCoords(Coords coords) {
   return (coords.first > worldSize.first || coords.first < 0 || coords.second > worldSize.second || coords.second < 0);
 }
 
+void GameOfLife::ensureEndRules() { shouldStop = (state.size() == 0); }
+
 // Getters
 Grid GameOfLife::getState() { return state; }
-int GameOfLife::getAliveCells() { return state.size(); }
+bool GameOfLife::getShouldStop() { return shouldStop; }
 
 // Actions
 void GameOfLife::initialize(Grid init) {
   state = init;
 
   for (Cell cell : init) {
-    Coords coords = handleWorldLimits(cell.coordinates);
-    if (coords.first != -1 || coords.second != -1) {
-      setWorldCell(handleWorldLimits(cell.coordinates), cell.isAlive);
-    }
+    setWorldCell(handleWorldLimits(cell.coordinates), cell.isAlive);
   }
 }
 
@@ -117,9 +120,7 @@ void GameOfLife::update() {
       auto neighbours = getNeighboursCoords(coords);
       for (Coords neighbour : neighbours) {
         Coords correctedCoords = handleWorldLimits(neighbour);
-        if (isPeriodic) {
-          aliveNearby += getWorldCell(correctedCoords);
-        } else if (!invalidCoords(correctedCoords)) {
+        if (!invalidCoords(correctedCoords)) {
           aliveNearby += getWorldCell(correctedCoords);
         }
       }
@@ -137,6 +138,8 @@ void GameOfLife::update() {
 #pragma omp critical
     state.insert(state.end(), nextState.begin(), nextState.end());
   }
+
+  ensureEndRules();
   world.swap(worldNext);
 }
 

@@ -54,7 +54,7 @@ using namespace std;
 
 // string state = "++++++++ +++++   +++      +++++++ +++++";
 
-string state = // Gosper glider gun 8)
+string state =  // Gosper glider gun 8)
     "--------------------------------------\n"
     "-------------------------+------------\n"
     "-----------------------+-+------------\n"
@@ -80,7 +80,7 @@ int main() {
   int genLimit = 1500;
   int worldX = 255;
   int worldY = 255;
-  
+
   initializeApp();
 
   GameOfLife game(Coords(worldX, worldY), isPeriodic);
@@ -88,19 +88,18 @@ int main() {
 
   Timer timer;
   timer.start();
-  while (app.running && (app.generation++ < genLimit-1) && (game.getAliveCells() > 0)) {
+  while (app.running && (app.generation++ < genLimit - 1) && (!game.getShouldStop())) {
     renderState(game.getState());
     game.update();
-    //timer.setTimeout(200);
+    // timer.setTimeout(200);
   }
   timer.stop();
 
-  // when it's game over, the game doesn't update it's state anymore, only renders it
   while (app.running) {
     renderState(game.getState());
     timer.setTimeout(500);
   }
-  
+
   cout << "Total generations: " << app.generation << endl;
   cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
 
@@ -133,6 +132,6 @@ Grid parseInit(string input) {
     }
     x++;
   }
-  
+
   return init;
 }
