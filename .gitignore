@@ -1,2 +1,3 @@
 /build
-example-of-real-grid.cpp
+../example-of-real-grid.cpp
+/.vscode/**/*

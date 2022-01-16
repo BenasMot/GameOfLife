@@ -1,8 +1,9 @@
 #include <omp.h>
 
+#include <deque>
 #include <iostream>
-#include <map>
 
+#include "src/Cell.hpp"
 #include "src/GameOfLife.hpp"
 #include "src/Timer.hpp"
 #include "src/Types.hpp"
@@ -10,20 +11,24 @@
 
 using namespace std;
 
-// string state = // Pulsar
-    // "--+++---+++--\n"
-    // "-------------\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "--+++---+++--\n"
-    // "-------------\n"
-    // "--+++---+++--\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "+----+-+----+\n"
-    // "-------------\n"
-    // "--+++---+++--\n";
+// Examples of various states
+
+// string state = "+++";
+
+// string state =  // Pulsar
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "--+++---+++--\n"
+//     "-------------\n"
+//     "--+++---+++--\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "+----+-+----+\n"
+//     "-------------\n"
+//     "--+++---+++--\n";
 
 // string state = // The R-pentonimo
 //     "---++--\n"
@@ -41,109 +46,89 @@ using namespace std;
 //     "---+------\n"
 //     "++--+++---\n";
 
-// string state =  // npm logo
-//     "++++-++++-++++++\n"
-//     "++-+-++-+-++-+-+\n"
-//     "++-+-++-+-++-+-+\n"
-//     "++-+-++++-++-+-+\n"
-//     "-----++---------\n";
+// string state = "++++++++ +++++   +++      +++++++ +++++"; // Pants
 
-// string state = "++++++++ +++++   +++      +++++++ +++++"; // long boy
+// string state =  // Gosper glider gun 8)
+//     "--------------------------------------\n"
+//     "-------------------------+------------\n"
+//     "-----------------------+-+------------\n"
+//     "-------------++------++------------++-\n"
+//     "------------+---+----++------------++-\n"
+//     "-++--------+-----+---++---------------\n"
+//     "-++--------+---+-++----+-+------------\n"
+//     "-----------+-----+-------+------------\n"
+//     "------------+---+---------------------\n"
+//     "-------------++-----------------------\n"
+//     "--------------------------------------";
 
- string state = // Gosper glider gun 8)
-     "--------------------------------------\n"
-     "-------------------------+------------\n"
-     "-----------------------+-+------------\n"
-     "-------------++------++------------++-\n"
-     "------------+---+----++------------++-\n"
-     "-++--------+-----+---++---------------\n"
-     "-++--------+---+-++----+-+------------\n"
-     "-----------+-----+-------+------------\n"
-     "------------+---+---------------------\n"
-     "-------------++-----------------------\n"
-     "--------------------------------------";
+string state =  // glider
+    "--+\n"
+    "+-+\n"
+    "-++\n";
 
 Grid parseInit(string input);
-void logState(Grid grid);
+void renderState(Grid grid);
+void renderGameEnd(GameOfLife game);
 
 int main() {
-  Timer timer;
-  GameOfLife game;
+  bool isPeriodic = true;
+  int genLimit = 30000;
+  int worldX = 255;
+  int worldY = 255;
+  int maxHistoryLimit = 1700;
 
-  initialize();
+  initializeApp();
+
+  GameOfLife game(Coords(worldX, worldY), isPeriodic, maxHistoryLimit);
   game.initialize(parseInit(state));
 
-  while (app.running) {
-    // clear the screen with all black before drawing anything
-    SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
-    SDL_RenderClear(app.renderer);
-
-    // make so that if ESC is pressed the game closes
-    handle_input();
-
-    // draw the grid lines
-    draw_grid();
-
-    // draw the cell(s)
-    for (auto cell : game.getState()) {
-      if (cell.second->getIsAlive()) {
-        draw_cell(cell.first);
-      } else {
-        draw_cell(cell.first, "red");
-      }
-    }
-
-    app.generation++;
-    display_generation();
-
-    // update the screen with any rendering performed since the previous call
-    SDL_RenderPresent(app.renderer);
-
-    // wait <...> (right now -> zero) milliseconds before next iteration
-    // SDL_Delay(0);
+  Timer timer;
+  timer.start();
+  while (app.running && (app.generation++ < genLimit - 1) && (!game.getShouldStop())) {
+    renderState(game.getState());
     game.update();
-    // timer.setTimeout(1);
   }
+  timer.stop();
+
+  renderGameEnd(game);
 
   cout << "Total generations: " << app.generation << endl;
+  cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
+  cout << game.getMessage() << endl;
 
-  // make sure program cleans up on exit
   terminate(EXIT_SUCCESS);
-  
-  return 0;
 }
 
-void logState(Grid grid) {
-  int y_max = 30, x_max = 70;
-  cout << "---------" << endl;
-  for (int i = -30; i < y_max; i++) {
-    for (int j = -40; j < x_max; j++) {
-      if (grid.count(pair{j, i}) != 0) {
-        Cell *cell = grid[pair{j, i}];
-        // if (cell->getIsAlive()) {
-        //   cout << "\033[1;34m" << cell->getNearbyCells() << cell->getWillDie();
-        // } else {
-        //   cout << "\033[1;31m" << cell->getNearbyCells() << cell->getWillAppear();
-        // }
-        cout << (cell->getIsAlive() ? "⬛️" : "🟥");  //⬜️⬛️🟥
-      } else {
-        cout << "⬜";
-      }
-    }
-    cout << endl;
+void renderGameEnd(GameOfLife game) {
+  while (app.running) {
+    renderState(game.getState());
+    Timer::setTimeout(500);
   }
+}
+
+void renderState(Grid grid) {
+  SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+  SDL_RenderClear(app.renderer);
+
+  draw_grid();
+  draw_cells(grid);
+
+  display_generation();
+  handle_input();
+  SDL_RenderPresent(app.renderer);
 }
 
 Grid parseInit(string input) {
   Grid init;
-  int x = 0, y = 0;
+  int xOffset = 20;
+  int x = xOffset, y = 60;
 
   for (auto chr : input) {
     if (chr == '+') {
-      init[pair{x, y}] = new Cell(true);
+      init.push_back(Cell(Coords(x, y), true));
     } else if (chr == '\n') {
       y++;
-      x = -1;
+      x = xOffset - 1;
     }
     x++;
   }
