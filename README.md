@@ -27,11 +27,3 @@
 	- Jei paspartinti sprendimo nepavyksta, pabandykite nustatyti priežastis.
 
 - Ar galite vizualizuoti rezultatus? O sprendimo eigą?
-
----
-## **To-do:**
-- Padaryti, kad žaidimas baigtųsi, kai:
-	- Stacionarios ląstelės
-	- Ribiniame cikle
-- Pridėti output'ą dėl ko žaidimas baigėsi
-
