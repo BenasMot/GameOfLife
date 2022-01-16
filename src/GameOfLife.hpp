@@ -133,10 +133,9 @@ void GameOfLife::update() {
       if (worldNext[i]) {
         nextState.emplace_back(Cell(coords, true));
       }
-
-#pragma omp critical
-      state.insert(state.end(), nextState.begin(), nextState.end());
     }
+#pragma omp critical
+    state.insert(state.end(), nextState.begin(), nextState.end());
   }
   world.swap(worldNext);
 }
