@@ -1,7 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include <SDL.h>
+#include <SDL.h> // requires SDL2 library (can be found at https://www.libsdl.org/download-2.0.php)
 
 #include <cstdio>
 #include <string>
@@ -10,10 +10,10 @@
 
 using namespace std;
 
-#define CELL_SIZE 10
+#define CELL_SIZE 4
 #define GRID_SIZE CELL_SIZE
-#define SCREEN_WIDTH 180 * CELL_SIZE
-#define SCREEN_HEIGHT 160 * CELL_SIZE
+#define SCREEN_WIDTH 255 * CELL_SIZE
+#define SCREEN_HEIGHT 255 * CELL_SIZE
 #define X_OFFSET 0
 #define Y_OFFSET 0
 
@@ -24,12 +24,11 @@ struct Game {
   int generation;
 };
 
-// initialize global structure to store app state
-// and SDL renderer for use in all functions
+// initialize global structure to store app state and the game's generation
 Game app = {.running = 1, .generation = 0};
 
+// safely terminate the program
 void terminate(int exit_code) {
-  // safely terminate the program
   if (app.renderer) {
     SDL_DestroyRenderer(app.renderer);
   }
@@ -41,16 +40,16 @@ void terminate(int exit_code) {
 }
 
 void initializeApp() {
-  // intialize and error catching if initializing fails
+  // intialize the game window and catch error if it fails to do so
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("error: failed to initialize SDL: %s\n", SDL_GetError());
     terminate(EXIT_FAILURE);
   }
 
-  // create the app window
+  // create the game app window
   app.window = SDL_CreateWindow("Generation: 0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
-  // error catching
+  // various error catching just in case
   if (!app.window) {
     printf("error: failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
     terminate(EXIT_FAILURE);
@@ -100,13 +99,16 @@ void draw_cell(Coords coords, string color = "white") {
     g = b = 0;
   }
 
+  // draws a cell with a color that's been decided in the if statement prior
   SDL_SetRenderDrawColor(app.renderer, r, g, b, a);
 
+  // cell parameters
   SDL_Rect cell = {.x = 0, .y = 0, .w = CELL_SIZE, .h = CELL_SIZE};
 
   cell.x = coords.first * CELL_SIZE + X_OFFSET;
   cell.y = coords.second * CELL_SIZE + Y_OFFSET;
 
+  // draw the cell
   SDL_RenderFillRect(app.renderer, &cell);
 }
 

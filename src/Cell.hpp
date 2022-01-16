@@ -3,10 +3,11 @@
 
 #include <utility>
 
+// each cell has a pair of coordinates and a boolean to show if it's alive
 struct Cell {
-  std::pair<int, int> coordinates; // change to Coords I guess?
+  std::pair<int, int> coordinates;
   bool isAlive;
-  Cell(std::pair<int, int> coords, bool alive) { // same here?
+  Cell(std::pair<int, int> coords, bool alive) {
     coordinates = coords;
     isAlive = alive;
   };

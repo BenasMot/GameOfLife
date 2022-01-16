@@ -10,6 +10,8 @@
 
 using namespace std;
 
+// Examples of various states
+
 // string state = "+";
 
 // string state =  // Pulsar
@@ -70,33 +72,35 @@ string state = // Gosper glider gun 8)
 //         "+-+\n"
 //         "-++\n";
 
-Grid parseInit(string input);
-void renderState(Grid grid);
+Grid parseInit(string input); // read initial state
+void renderState(Grid grid); // render current state
 
 int main() {
-  bool isPeriodic = true;
-  int genLimit = 1500;
-  int worldX = 255;
-  int worldY = 255;
+  bool isPeriodic = true; // true for periodic grid, false for infinite
+  int genLimit = 1500; // generation limit. When reached, it's game over
+  int worldX = 255; // X-axis limit for the cells to "live" in
+  int worldY = 255; // Y-axis limit for the cells to "live" in
   
-  initializeApp();
+  initializeApp(); // start the Game (opens the window)
 
-  GameOfLife game(Coords(worldX, worldY), isPeriodic);
-  game.initialize(parseInit(state));
+  GameOfLife game(Coords(worldX, worldY), isPeriodic); // create the "world" in which cells will "live" in
+  game.initialize(parseInit(state)); // saves the initial state
 
   Timer timer;
   timer.start();
-  while (app.running && app.generation++ < genLimit-1 && game.getAliveCells() > 0) {
-    renderState(game.getState());
-    game.update();
+  while (app.running && (app.generation++ < genLimit-1) && (game.getAliveCells() > 0)) {
+    renderState(game.getState()); // get the current state, then render it
+    game.update(); // update the game state
     //timer.setTimeout(200);
   }
   timer.stop();
 
+  // when it's game over, the game doesn't update it's state anymore, only renders it
   while (app.running) {
     renderState(game.getState());
     timer.setTimeout(500);
   }
+  
   cout << "Total generations: " << app.generation << endl;
   cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
 
@@ -107,11 +111,11 @@ int main() {
 }
 
 void renderState(Grid grid) {
-  // clear the screen with all black before drawing anything
+  // make the whole screen black before drawing anything
   SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
   SDL_RenderClear(app.renderer);
 
-  // make so that if ESC is pressed the game closes
+  // make so that if ESC or X (on game window) is pressed the game closes
   handle_input();
 
   // draw the grid lines
@@ -127,7 +131,9 @@ void renderState(Grid grid) {
     }
   }
 
+  // display current generation on the game window title
   display_generation();
+
   // update the screen with any rendering performed since the previous call
   SDL_RenderPresent(app.renderer);
 }
