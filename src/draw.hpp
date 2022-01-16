@@ -22,12 +22,11 @@ struct Game {
   SDL_Window *window;
   bool running;
   int generation;
-  int aliveCells;
 };
 
 // initialize global structure to store app state
 // and SDL renderer for use in all functions
-Game app = {.running = 1, .generation = 0, .aliveCells = 0};
+Game app = {.running = 1, .generation = 0};
 
 void terminate(int exit_code) {
   // safely terminate the program

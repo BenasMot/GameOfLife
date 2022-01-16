@@ -66,14 +66,13 @@ string state =  // diehard
 //     "--------------------------------------";
 
 Grid parseInit(string input);
-//void logState(Grid grid); don't need anymore
 void renderState(Grid grid);
 
 int main() {
   initializeApp();
 
   GameOfLife game(Coords(255, 255), true);
-  game.initialize(parseInit(state), app.aliveCells);
+  game.initialize(parseInit(state));
 
   Timer timer;
   timer.start();
@@ -131,7 +130,6 @@ Grid parseInit(string input) {
   for (auto chr : input) {
     if (chr == '+') {
       init.push_back(Cell(Coords(x, y), true));
-      app.aliveCells++;
     } else if (chr == '\n') {
       y++;
       x = xOffset - 1;
