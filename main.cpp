@@ -41,10 +41,10 @@ using namespace std;
 //     "++------\n"
 //     "-+---+++\n";
 
-string state = // acorn
-    "-+--------\n"
-    "---+------\n"
-    "++--+++---\n";
+// string state = // acorn
+//     "-+--------\n"
+//     "---+------\n"
+//     "++--+++---\n";
 
 // string state = "++++++++ +++++   +++      +++++++ +++++"; // Pants
 
@@ -61,21 +61,21 @@ string state = // acorn
 //     "-------------++-----------------------\n"
 //     "--------------------------------------";
 
-// string state =  // glider
-//     "--+\n"
-//     "+-+\n"
-//     "-++\n";
+string state =  // glider
+    "--+\n"
+    "+-+\n"
+    "-++\n";
 
 Grid parseInit(string input);
 void renderState(Grid grid);
 void renderGameEnd(GameOfLife game);
 
 int main() {
-  bool isPeriodic = false;
+  bool isPeriodic = true;
   int genLimit = 30000;
   int worldX = 255;
   int worldY = 255;
-  int maxHistoryLimit = 100;
+  int maxHistoryLimit = 1700;
 
   initializeApp();
 

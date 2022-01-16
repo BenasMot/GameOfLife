@@ -123,7 +123,7 @@ void GameOfLife::recordWorldHistory() {
 
 void GameOfLife::ensureEndRules() {
   if (worldHistory.size() > 1) {
-#pragma parallel for
+#pragma omp parallel for
     for (int i = worldHistory.size() - 2; i >= 0; i--) {
       if (worldHistory[i] == worldHistory[worldHistory.size() - 1]) {
 #pragma omp critical
