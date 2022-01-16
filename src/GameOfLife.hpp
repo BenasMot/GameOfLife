@@ -2,7 +2,7 @@
 #define GAMEOFLIFE_H
 
 #include <deque>
-#include <iostream>
+#include <string>
 
 #include "Cell.hpp"
 #include "Timer.hpp"
@@ -10,13 +10,17 @@
 
 class GameOfLife {
  private:
+  int maxHistorySize;
   Coords worldSize;
   bool isPeriodic;
   World world;
   World worldNext;
   Grid state;
   std::deque<World> worldHistory;
+  std::deque<Grid> stateHistory;
   bool shouldStop;
+  std::string message;
+  int generation;
 
   // Utils
   Coords handleWorldLimits(Coords coords);
@@ -24,14 +28,17 @@ class GameOfLife {
   void setWorldCell(Coords coords, bool isAlive);
   Coords worldIndexToCoords(int index);
   bool invalidCoords(Coords coords);
+  int getAliveNeighboursCount(Coords coords);
+  void recordWorldHistory();
   void ensureEndRules();
 
  public:
-  GameOfLife(Coords size, bool isPeriodic);
+  GameOfLife(Coords size, bool isPeriodic, int maxHistorySize);
 
   // Getters
   Grid getState();
   bool getShouldStop();
+  std::string getMessage();
 
   // Actions
   void initialize(Grid init);
@@ -39,11 +46,13 @@ class GameOfLife {
 };
 
 // Constructor
-GameOfLife::GameOfLife(Coords size, bool periodic) {
+GameOfLife::GameOfLife(Coords size, bool periodic, int maxHistorySize) {
   shouldStop = false;
+  generation = 0;
 
   worldSize = size;
   isPeriodic = periodic;
+  this->maxHistorySize = maxHistorySize;
 
   world = World(size.first * size.second);
   worldNext = World(size.first * size.second);
@@ -95,26 +104,40 @@ bool GameOfLife::invalidCoords(Coords coords) {
   return (coords.first > worldSize.first || coords.first < 0 || coords.second > worldSize.second || coords.second < 0);
 }
 
-void GameOfLife::ensureEndRules() {
-  // shouldStop = (state.size() == 0);
-
-  if (worldHistory.size() != 1) shouldStop = (worldHistory[0] == worldHistory[worldHistory.size()]);
-
-
-  for (int i = 0; i < worldNext.size(); ++i) {
-    std::cout << worldNext[i];
-    if (i % worldSize.first == 0) std::cout << "\n";
+int GameOfLife::getAliveNeighboursCount(Coords coords) {
+  int aliveNearby = 0;
+  auto neighbours = getNeighboursCoords(coords);
+  for (Coords neighbour : neighbours) {
+    Coords correctedCoords = handleWorldLimits(neighbour);
+    if (!invalidCoords(correctedCoords)) {
+      aliveNearby += getWorldCell(correctedCoords);
+    }
   }
-  std::cout << std::endl;
-  // if (worldHistory.size() != 1) {
-  //   std::cout << (worldHistory[0] == worldHistory[worldHistory.size()]) << std::endl;
-  //   std::cout << worldHistory.size() << std::endl;
-  // }
+  return aliveNearby;
+}
+
+void GameOfLife::recordWorldHistory() {
+  if (worldHistory.size() == maxHistorySize + 1) worldHistory.pop_front();
+  worldHistory.push_back(worldNext);
+}
+
+void GameOfLife::ensureEndRules() {
+  if (worldHistory.size() > 1) {
+#pragma parallel for
+    for (int i = worldHistory.size() - 2; i >= 0; i--) {
+      if (worldHistory[i] == worldHistory[worldHistory.size() - 1]) {
+#pragma omp critical
+        shouldStop = true;
+        message = "Finished... Equilibrium found at " + (string)generation + " with a period of " + worldHistory.size()-i;
+      }
+    }
+  }
 }
 
 // Getters
 Grid GameOfLife::getState() { return state; }
 bool GameOfLife::getShouldStop() { return shouldStop; }
+std::string GameOfLife::getMessage() { return message; }
 
 // Actions
 void GameOfLife::initialize(Grid init) {
@@ -126,6 +149,7 @@ void GameOfLife::initialize(Grid init) {
 }
 
 void GameOfLife::update() {
+  generation++;
   state.clear();
 #pragma omp parallel
   {
@@ -134,16 +158,8 @@ void GameOfLife::update() {
 #pragma omp for
     for (int i = 0; i < worldSize.first * worldSize.second; ++i) {
       Coords coords = worldIndexToCoords(i);
-      int aliveNearby = 0;
 
-      auto neighbours = getNeighboursCoords(coords);
-      for (Coords neighbour : neighbours) {
-        Coords correctedCoords = handleWorldLimits(neighbour);
-        if (!invalidCoords(correctedCoords)) {
-          aliveNearby += getWorldCell(correctedCoords);
-        }
-      }
-
+      int aliveNearby = getAliveNeighboursCount(coords);
       if (world[i]) {
         worldNext[i] = !(aliveNearby < 2 || aliveNearby >= 4);
       } else {
@@ -158,11 +174,9 @@ void GameOfLife::update() {
     state.insert(state.end(), nextState.begin(), nextState.end());
   }
 
-  if (worldHistory.size() == 30) worldHistory.pop_front();
-  worldHistory.push_back(worldNext);
-
-  // #pragma omp critical
+  recordWorldHistory();
   ensureEndRules();
+
   world.swap(worldNext);
 }
 

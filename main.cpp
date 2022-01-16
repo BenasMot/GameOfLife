@@ -46,45 +46,40 @@ using namespace std;
 //     "---+------\n"
 //     "++--+++---\n";
 
-// string state =  // npm logo
-//     "++++-++++-++++++\n"
-//     "++-+-++-+-++-+-+\n"
-//     "++-+-++-+-++-+-+\n"
-//     "++-+-++++-++-+-+\n"
-//     "-----++---------\n";
+// string state = "++++++++ +++++   +++      +++++++ +++++"; // Pants
 
-// string state = "++++++++ +++++   +++      +++++++ +++++";
+string state =  // Gosper glider gun 8)
+    "--------------------------------------\n"
+    "-------------------------+------------\n"
+    "-----------------------+-+------------\n"
+    "-------------++------++------------++-\n"
+    "------------+---+----++------------++-\n"
+    "-++--------+-----+---++---------------\n"
+    "-++--------+---+-++----+-+------------\n"
+    "-----------+-----+-------+------------\n"
+    "------------+---+---------------------\n"
+    "-------------++-----------------------\n"
+    "--------------------------------------";
 
-// string state =  // Gosper glider gun 8)
-//     "--------------------------------------\n"
-//     "-------------------------+------------\n"
-//     "-----------------------+-+------------\n"
-//     "-------------++------++------------++-\n"
-//     "------------+---+----++------------++-\n"
-//     "-++--------+-----+---++---------------\n"
-//     "-++--------+---+-++----+-+------------\n"
-//     "-----------+-----+-------+------------\n"
-//     "------------+---+---------------------\n"
-//     "-------------++-----------------------\n"
-//     "--------------------------------------";
-
-string state =  // glider
-    "--+\n"
-    "+-+\n"
-    "-++\n";
+// string state =  // glider
+//     "--+\n"
+//     "+-+\n"
+//     "-++\n";
 
 Grid parseInit(string input);
 void renderState(Grid grid);
+void renderGameEnd(GameOfLife game);
 
 int main() {
-  bool isPeriodic = true;
-  int genLimit = 1500;
-  int worldX = 7;
-  int worldY = 7;
+  bool isPeriodic = false;
+  int genLimit = 30000;
+  int worldX = 255;
+  int worldY = 255;
+  int maxHistoryLimit = 100;
 
   initializeApp();
 
-  GameOfLife game(Coords(worldX, worldY), isPeriodic);
+  GameOfLife game(Coords(worldX, worldY), isPeriodic, maxHistoryLimit);
   game.initialize(parseInit(state));
 
   Timer timer;
@@ -92,19 +87,23 @@ int main() {
   while (app.running && (app.generation++ < genLimit - 1) && (!game.getShouldStop())) {
     renderState(game.getState());
     game.update();
-    timer.setTimeout(200);
   }
   timer.stop();
 
-  while (app.running) {
-    renderState(game.getState());
-    timer.setTimeout(500);
-  }
+  renderGameEnd(game);
 
   cout << "Total generations: " << app.generation << endl;
   cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
+  cout << game.getMessage() << endl;
 
   terminate(EXIT_SUCCESS);
+}
+
+void renderGameEnd(GameOfLife game) {
+  while (app.running) {
+    renderState(game.getState());
+    Timer::setTimeout(500);
+  }
 }
 
 void renderState(Grid grid) {
@@ -121,8 +120,8 @@ void renderState(Grid grid) {
 
 Grid parseInit(string input) {
   Grid init;
-  int xOffset = 0;
-  int x = xOffset, y = 0;
+  int xOffset = 20;
+  int x = xOffset, y = 60;
 
   for (auto chr : input) {
     if (chr == '+') {
