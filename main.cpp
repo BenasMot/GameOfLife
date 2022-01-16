@@ -72,25 +72,25 @@ string state = // Gosper glider gun 8)
 //         "+-+\n"
 //         "-++\n";
 
-Grid parseInit(string input); // read initial state
-void renderState(Grid grid); // render current state
+Grid parseInit(string input);
+void renderState(Grid grid);
 
 int main() {
-  bool isPeriodic = true; // true for periodic grid, false for infinite
-  int genLimit = 1500; // generation limit. When reached, it's game over
-  int worldX = 255; // X-axis limit for the cells to "live" in
-  int worldY = 255; // Y-axis limit for the cells to "live" in
+  bool isPeriodic = true;
+  int genLimit = 1500;
+  int worldX = 255;
+  int worldY = 255;
   
-  initializeApp(); // start the Game (opens the window)
+  initializeApp();
 
-  GameOfLife game(Coords(worldX, worldY), isPeriodic); // create the "world" in which cells will "live" in
-  game.initialize(parseInit(state)); // saves the initial state
+  GameOfLife game(Coords(worldX, worldY), isPeriodic);
+  game.initialize(parseInit(state));
 
   Timer timer;
   timer.start();
   while (app.running && (app.generation++ < genLimit-1) && (game.getAliveCells() > 0)) {
-    renderState(game.getState()); // get the current state, then render it
-    game.update(); // update the game state
+    renderState(game.getState());
+    game.update();
     //timer.setTimeout(200);
   }
   timer.stop();
@@ -104,37 +104,18 @@ int main() {
   cout << "Total generations: " << app.generation << endl;
   cout << "Time elapsed: " << timer.get_elapsed() / 1e6 << endl;
 
-  // make sure program cleans up on exit
   terminate(EXIT_SUCCESS);
-
-  return 0;
 }
 
 void renderState(Grid grid) {
-  // make the whole screen black before drawing anything
   SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
   SDL_RenderClear(app.renderer);
 
-  // make so that if ESC or X (on game window) is pressed the game closes
-  handle_input();
-
-  // draw the grid lines
   draw_grid();
+  draw_cells(grid);
 
-  // draw the cell(s)
-  for (auto cell : grid) {
-    Coords coords = cell.coordinates;
-    if (cell.isAlive) {
-      draw_cell(coords);
-    } else {
-      draw_cell(coords, "red");
-    }
-  }
-
-  // display current generation on the game window title
   display_generation();
-
-  // update the screen with any rendering performed since the previous call
+  handle_input();
   SDL_RenderPresent(app.renderer);
 }
 

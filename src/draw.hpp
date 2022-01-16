@@ -1,7 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include <SDL.h> // requires SDL2 library (can be found at https://www.libsdl.org/download-2.0.php)
+#include <SDL.h>  // requires SDL2 library (can be found at https://www.libsdl.org/download-2.0.php)
 
 #include <cstdio>
 #include <string>
@@ -110,6 +110,17 @@ void draw_cell(Coords coords, string color = "white") {
 
   // draw the cell
   SDL_RenderFillRect(app.renderer, &cell);
+}
+
+void draw_cells(Grid grid) {
+  for (auto cell : grid) {
+    Coords coords = cell.coordinates;
+    if (cell.isAlive) {
+      draw_cell(coords);
+    } else {
+      draw_cell(coords, "red");
+    }
+  }
 }
 
 void display_generation(void) {
