@@ -1,5 +1,6 @@
 #include <omp.h>
 
+#include <deque>
 #include <iostream>
 
 #include "src/Cell.hpp"
@@ -54,23 +55,23 @@ using namespace std;
 
 // string state = "++++++++ +++++   +++      +++++++ +++++";
 
-string state =  // Gosper glider gun 8)
-    "--------------------------------------\n"
-    "-------------------------+------------\n"
-    "-----------------------+-+------------\n"
-    "-------------++------++------------++-\n"
-    "------------+---+----++------------++-\n"
-    "-++--------+-----+---++---------------\n"
-    "-++--------+---+-++----+-+------------\n"
-    "-----------+-----+-------+------------\n"
-    "------------+---+---------------------\n"
-    "-------------++-----------------------\n"
-    "--------------------------------------";
+// string state =  // Gosper glider gun 8)
+//     "--------------------------------------\n"
+//     "-------------------------+------------\n"
+//     "-----------------------+-+------------\n"
+//     "-------------++------++------------++-\n"
+//     "------------+---+----++------------++-\n"
+//     "-++--------+-----+---++---------------\n"
+//     "-++--------+---+-++----+-+------------\n"
+//     "-----------+-----+-------+------------\n"
+//     "------------+---+---------------------\n"
+//     "-------------++-----------------------\n"
+//     "--------------------------------------";
 
-//  string state = // glider
-//         "--+\n"
-//         "+-+\n"
-//         "-++\n";
+string state =  // glider
+    "--+\n"
+    "+-+\n"
+    "-++\n";
 
 Grid parseInit(string input);
 void renderState(Grid grid);
@@ -78,8 +79,8 @@ void renderState(Grid grid);
 int main() {
   bool isPeriodic = true;
   int genLimit = 1500;
-  int worldX = 255;
-  int worldY = 255;
+  int worldX = 7;
+  int worldY = 7;
 
   initializeApp();
 
@@ -91,7 +92,7 @@ int main() {
   while (app.running && (app.generation++ < genLimit - 1) && (!game.getShouldStop())) {
     renderState(game.getState());
     game.update();
-    // timer.setTimeout(200);
+    timer.setTimeout(200);
   }
   timer.stop();
 
@@ -120,8 +121,8 @@ void renderState(Grid grid) {
 
 Grid parseInit(string input) {
   Grid init;
-  int xOffset = 25;
-  int x = xOffset, y = 50;
+  int xOffset = 0;
+  int x = xOffset, y = 0;
 
   for (auto chr : input) {
     if (chr == '+') {

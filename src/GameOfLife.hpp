@@ -1,6 +1,9 @@
 #ifndef GAMEOFLIFE_H
 #define GAMEOFLIFE_H
 
+#include <deque>
+#include <iostream>
+
 #include "Cell.hpp"
 #include "Timer.hpp"
 #include "Types.hpp"
@@ -12,6 +15,7 @@ class GameOfLife {
   World world;
   World worldNext;
   Grid state;
+  std::deque<World> worldHistory;
   bool shouldStop;
 
   // Utils
@@ -91,7 +95,22 @@ bool GameOfLife::invalidCoords(Coords coords) {
   return (coords.first > worldSize.first || coords.first < 0 || coords.second > worldSize.second || coords.second < 0);
 }
 
-void GameOfLife::ensureEndRules() { shouldStop = (state.size() == 0); }
+void GameOfLife::ensureEndRules() {
+  // shouldStop = (state.size() == 0);
+
+  if (worldHistory.size() != 1) shouldStop = (worldHistory[0] == worldHistory[worldHistory.size()]);
+
+
+  for (int i = 0; i < worldNext.size(); ++i) {
+    std::cout << worldNext[i];
+    if (i % worldSize.first == 0) std::cout << "\n";
+  }
+  std::cout << std::endl;
+  // if (worldHistory.size() != 1) {
+  //   std::cout << (worldHistory[0] == worldHistory[worldHistory.size()]) << std::endl;
+  //   std::cout << worldHistory.size() << std::endl;
+  // }
+}
 
 // Getters
 Grid GameOfLife::getState() { return state; }
@@ -139,6 +158,10 @@ void GameOfLife::update() {
     state.insert(state.end(), nextState.begin(), nextState.end());
   }
 
+  if (worldHistory.size() == 30) worldHistory.pop_front();
+  worldHistory.push_back(worldNext);
+
+  // #pragma omp critical
   ensureEndRules();
   world.swap(worldNext);
 }

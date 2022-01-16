@@ -11,6 +11,7 @@ struct Cell {
     coordinates = coords;
     isAlive = alive;
   };
+  bool operator==(const Cell &cell) const { return (coordinates == cell.coordinates && isAlive == cell.isAlive); }
 };
 
 #endif
