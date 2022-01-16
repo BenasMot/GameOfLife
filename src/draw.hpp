@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define CELL_SIZE 5
+#define CELL_SIZE 10
 #define GRID_SIZE CELL_SIZE
 #define SCREEN_WIDTH 180 * CELL_SIZE
 #define SCREEN_HEIGHT 160 * CELL_SIZE

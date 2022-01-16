@@ -18,6 +18,7 @@ class GameOfLife {
   bool getWorldCell(Coords coords);
   void setWorldCell(Coords coords, bool isAlive);
   Coords worldIndexToCoords(int index);
+  bool invalidCoords(Coords coords);
 
  public:
   GameOfLife(Coords size, bool isPeriodic);
@@ -32,11 +33,11 @@ class GameOfLife {
 };
 
 // Constructor
-GameOfLife::GameOfLife(Coords size, bool isPeriodic) {
+GameOfLife::GameOfLife(Coords size, bool periodic) {
   worldSize = size;
   world = World(size.first * size.second);
   worldNext = World(size.first * size.second);
-  isPeriodic = isPeriodic;
+  isPeriodic = periodic;
   state.reserve(size.first * size.second);
 }
 
@@ -44,19 +45,11 @@ GameOfLife::GameOfLife(Coords size, bool isPeriodic) {
 Coords GameOfLife::handleWorldLimits(Coords coords) {
   int x, y;
   if (isPeriodic) {
-    x = coords.first % worldSize.first;
-    y = coords.second % worldSize.second;
+    x = (coords.first + worldSize.first) % worldSize.first;
+    y = (coords.second + worldSize.first) % worldSize.second;
   } else {
-    if (coords.first > worldSize.first || coords.first < 0) {
-      x = -1;
-    } else {
-      x = coords.first;
-    }
-    if (coords.second > worldSize.second || coords.second < 0) {
-      y = -1;
-    } else {
-      y = coords.second;
-    }
+    x = coords.first;
+    y = coords.second;
   }
   return Coords(x, y);
 }
@@ -90,6 +83,10 @@ std::vector<Coords> getNeighboursCoords(Coords coords) {
   return neighbourCoords;
 }
 
+bool GameOfLife::invalidCoords(Coords coords) {
+  return (coords.first > worldSize.first || coords.first < 0 || coords.second > worldSize.second || coords.second < 0);
+}
+
 // Getters
 Grid GameOfLife::getState() { return state; }
 int GameOfLife::getAliveCells() { return state.size(); }
@@ -120,8 +117,10 @@ void GameOfLife::update() {
       auto neighbours = getNeighboursCoords(coords);
       for (Coords neighbour : neighbours) {
         Coords correctedCoords = handleWorldLimits(neighbour);
-        if (correctedCoords.first != -1 && correctedCoords.second != -1) {
-          aliveNearby += getWorldCell(handleWorldLimits(neighbour));
+        if (isPeriodic) {
+          aliveNearby += getWorldCell(correctedCoords);
+        } else if (!invalidCoords(correctedCoords)) {
+          aliveNearby += getWorldCell(correctedCoords);
         }
       }
 

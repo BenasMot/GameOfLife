@@ -33,10 +33,10 @@ using namespace std;
 //     "---+---\n"
 //     "-------";
 
-string state =  // diehard
-    "------+-\n"
-    "++------\n"
-    "-+---+++\n";
+// string state =  // diehard
+//     "------+-\n"
+//     "++------\n"
+//     "-+---+++\n";
 
 // string state = // acorn
 //     "-+--------\n"
@@ -64,6 +64,10 @@ string state =  // diehard
 //     "------------+---+---------------------\n"
 //     "-------------++-----------------------\n"
 //     "--------------------------------------";
+ string state = // glider
+        "--+\n"
+        "+-+\n"
+        "-++\n";
 
 Grid parseInit(string input);
 void renderState(Grid grid);
@@ -79,7 +83,7 @@ int main() {
   while (app.running && app.generation++ < 599 && game.getAliveCells() > 0) {
     renderState(game.getState());
     game.update();
-    // timer.setTimeout(200);
+    timer.setTimeout(200);
   }
   timer.stop();
 
