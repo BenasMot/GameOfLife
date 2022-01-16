@@ -30,11 +30,8 @@
 
 ---
 ## **To-do:**
-- Padaryti periodinį žaidimo režimą
 - Padaryti, kad žaidimas baigtųsi, kai:
-	- Nėra ląstelių (done)
 	- Stacionarios ląstelės
 	- Ribiniame cikle
-	- Keliauja į begalybę (kinda done)
 - Pridėti output'ą dėl ko žaidimas baigėsi
 
