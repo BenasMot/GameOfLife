@@ -46,7 +46,7 @@ Coords GameOfLife::handleWorldLimits(Coords coords) {
   int x, y;
   if (isPeriodic) {
     x = (coords.first + worldSize.first) % worldSize.first;
-    y = (coords.second + worldSize.first) % worldSize.second;
+    y = (coords.second + worldSize.second) % worldSize.second;
   } else {
     x = coords.first;
     y = coords.second;
